@@ -1,7 +1,0 @@
-
-
-class Matricizer:
-
-    def __init__(self, materializer):
-
-        

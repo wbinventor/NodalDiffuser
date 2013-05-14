@@ -8,7 +8,7 @@ solver = Solver(matricizer)
 
 matricizer.initializeCMFDDestructionMatrix()
 matricizer.initializeCMFDProductionMatrix()
-matricizer.initializeNEM4thOrderCoeffMatrix()
+matricizer.initializeNEM4thOrderCoeffMatrix(keff=1.0)
 matricizer.initializeNEM2ndOrderCoeffMatrix()
 
 #matricizer.spyCMFDProductionMatrix()
@@ -16,4 +16,7 @@ matricizer.initializeNEM2ndOrderCoeffMatrix()
 #matricizer.spyNEM4thOrderCoeffMatrix()
 #matricizer.spyNEM2ndOrderCoeffMatrix()
 
-solver.solveCMFD()
+#solver.solveCMFD()
+#solver.plotCMFDFlux()
+
+solver.solveNEM4()

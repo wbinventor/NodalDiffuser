@@ -22,7 +22,7 @@ class Matricizer:
 
         # Compute diffusion coupling coefficients for CMFD
         self.D_tilde = np.zeros(2)
-        self.computeDTildes()
+        self.computeDTilde()
 
         # Create numpy arrays for CMFD destruction (M) and production (F) arrays
         self.M = np.zeros((4,4))
@@ -33,7 +33,8 @@ class Matricizer:
         self.NEM2_coeffs = np.zeros((8,8))
 
 
-    def computeDTildes(self):
+    def computeDTilde(self):
+
         # Diffusion coupling coefficients
         self.D_tilde[0] = (2. * self.D['fuel'][0] * self.D['coolant'][0]) / \
                     (self.delta_x * (self.D['fuel'][0] + self.D['coolant'][0]))
@@ -42,27 +43,27 @@ class Matricizer:
                     (self.delta_x * (self.D['fuel'][1] + self.D['coolant'][1]))
 
 
-    def initializeCMFDDestructionMatrix(self, D_hat=[0., 0.]):
+    def initializeCMFDDestructionMatrix(self, D_hat=np.array([[0.,0.],[0.,0.]])):
 
         # Fuel group 1
-        self.M[0,0] = self.D_tilde[0] - D_hat[0] + (self.abs['fuel'][0] + \
+        self.M[0,0] = self.D_tilde[0] - D_hat[0,0] + (self.abs['fuel'][0] + \
                       self.scatter['fuel']) * self.delta_x
-        self.M[0,2] = -self.D_tilde[0] - D_hat[0]
+        self.M[0,2] = -self.D_tilde[0] - D_hat[0,0]
 
         # Fuel group 2
-        self.M[1,1] = self.D_tilde[1] - D_hat[1] + self.abs['fuel'][1] * \
+        self.M[1,1] = self.D_tilde[1] - D_hat[0,1] + self.abs['fuel'][1] * \
                       self.delta_x
-        self.M[1,3] = -self.D_tilde[1] - D_hat[1]
+        self.M[1,3] = -self.D_tilde[1] - D_hat[0,1]
         self.M[1,0] = -self.scatter['fuel'] * self.delta_x
 
         # Coolant group 1
-        self.M[2,0] = -self.D_tilde[0] + D_hat[0]
-        self.M[2,2] = self.D_tilde[0] - D_hat[0] + (self.abs['coolant'][0] + \
+        self.M[2,0] = -self.D_tilde[0] + D_hat[1,0]
+        self.M[2,2] = self.D_tilde[0] + D_hat[1,0] + (self.abs['coolant'][0] + \
                  self.scatter['coolant']) * self.delta_x
 
         # Coolant group 2
-        self.M[3,1] = -self.D_tilde[1] + D_hat[1]
-        self.M[3,3] = self.D_tilde[1] - D_hat[1] + \
+        self.M[3,1] = -self.D_tilde[1] + D_hat[1,1]
+        self.M[3,3] = self.D_tilde[1] + D_hat[1,1] + \
                  self.abs['coolant'][1] * self.delta_x
         self.M[3,2] = -self.scatter['coolant'] * self.delta_x
 
@@ -74,16 +75,22 @@ class Matricizer:
         self.F[0,1] = self.fission['fuel'][1] * self.delta_x
 
 
-    def initializeNEM4thOrderCoeffMatrix(self):
+    def initializeNEM4thOrderCoeffMatrix(self, keff=1.0):
 
         # Build 4th order NEM matrix using coefficients found in Mathematica
-        self.NEM4_coeffs[0,0] = (self.abs['fuel'][0]+self.scatter['fuel']) / 3.
-        self.NEM4_coeffs[0,2] = (12. * self.D['fuel'][0] / self.delta_x**2) + \
-                            ((self.abs['fuel'][0] + self.scatter['fuel']) / 5.)
+        self.NEM4_coeffs[0,0] = (-self.fission['fuel'][0] / (3. * keff)) + \
+                                (self.abs['fuel'][0]+self.scatter['fuel']) / 3.
+        self.NEM4_coeffs[0,2] = (12. * self.D['fuel'][0] / self.delta_x**2) - \
+                              (self.fission['fuel'][0] / (5. * float(keff))) + \
+                              ((self.abs['fuel'][0] + self.scatter['fuel']) / 5.)
+        print 'keff = ' + str(keff)
+        print 'fission 1 = ' + str(-self.fission['fuel'][1] / 3.)
+        self.NEM4_coeffs[0,4] = -self.fission['fuel'][1] / (3. * keff)
+        self.NEM4_coeffs[0,6] = -self.fission['fuel'][1] / (5. * keff)
 
         self.NEM4_coeffs[1,0] = -self.scatter['fuel'] / 3.
         self.NEM4_coeffs[1,2] = -self.scatter['fuel'] / 5.
-        self.NEM4_coeffs[1,4] = self.abs['fuel'][0] / 3.
+        self.NEM4_coeffs[1,4] = self.abs['fuel'][1] / 3.
         self.NEM4_coeffs[1,6] = (12. * self.D['fuel'][1] / self.delta_x**2) + \
                                 (self.abs['fuel'][1] / 5.)
 
@@ -99,10 +106,14 @@ class Matricizer:
         self.NEM4_coeffs[3,14] = (12. * self.D['coolant'][1] / \
                                 self.delta_x**2) + (self.abs['coolant'][1] / 5.)
 
-        self.NEM4_coeffs[4,1] = (self.abs['fuel'][0]+self.scatter['fuel']) / 5.
-        self.NEM4_coeffs[4,3] = (-12. * self.D['fuel'][0] / self.delta_x**2) - \
-                                           (3. * (self.abs['fuel'][0] + \
-                                           self.scatter['fuel']) / 35.)
+        self.NEM4_coeffs[4,1] = (-self.fission['fuel'][0] / (5. * keff)) + \
+                                (self.abs['fuel'][0]+self.scatter['fuel']) / 5.
+        self.NEM4_coeffs[4,3] = (-12. * self.D['fuel'][0] / self.delta_x**2) + \
+                               (3. * self.fission['fuel'][0] / (35. * keff)) - \
+                               (3. * (self.abs['fuel'][0] + \
+                                      self.scatter['fuel']) / 35.)
+        self.NEM4_coeffs[4,5] = -self.fission['fuel'][1] / (5. * keff)
+        self.NEM4_coeffs[4,7] = 3. * self.fission['fuel'][1] / (35. * keff)
 
         self.NEM4_coeffs[5,1] = -self.scatter['fuel'] / 5.
         self.NEM4_coeffs[5,3] = 3. * self.scatter['fuel'] / 35.
@@ -213,6 +224,9 @@ class Matricizer:
     ############################################################################
     #############################  GETTERS / SETTERS  ##########################
     ############################################################################
+
+    def getMaterializer(self):
+        return self.materializer
 
     def getDiffusionTildes(self):
         return self.D_tilde
