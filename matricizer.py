@@ -30,7 +30,7 @@ class Matricizer:
 
         # Create numpy arrays for NEM-4 and NEM-2 coefficients
         self.NEM4_coeffs = np.zeros((16,16))
-        self.NEM4_coeffs = np.zeros((8,8))
+        self.NEM2_coeffs = np.zeros((8,8))
 
 
     def computeDTildes(self):
@@ -174,7 +174,7 @@ class Matricizer:
         self.NEM4_coeffs[15,13] = 1.
         
 
-    def initializeNEM4thOrderCoeffMatrix(self):
+    def initializeNEM2ndOrderCoeffMatrix(self):
 
         # Build 2nd order NEM matrix using coefficients found in Mathematica
         self.NEM2_coeffs[0,0] = -2. * self.D['fuel'][0] / self.delta_x
@@ -242,25 +242,25 @@ class Matricizer:
         fig = plt.figure()
         plt.spy(self.F)
         plt.title('CMFD Production Matrix')
-        plt.savefig('cmfd-production-matrix.png')
+        plt.show()
 
     
     def spyCMFDDestructionMatrix(self):
         fig = plt.figure()
         plt.spy(self.M)
         plt.title('CMFD Destruction Matrix')
-        plt.savefig('cmfd-destruction-matrix.png')
+        plt.show()
 
 
     def spyNEM4thOrderCoeffMatrix(self):
         fig = plt.figure()
         plt.spy(self.NEM4_coeffs) 
         plt.title('NEM-4 Coeffs')
-        plt.savefig('nem-4-coeffs-matrix.png')
+        plt.show()
 
 
     def spyNEM2ndOrderCoeffMatrix(self):
         fig = plt.figure()
         plt.spy(self.NEM2_coeffs) 
         plt.title('NEM-2 Coeffs')
-        plt.savefig('nem-2-coeffs-matrix.png')
+        plt.show()

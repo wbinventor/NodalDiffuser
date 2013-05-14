@@ -9,11 +9,10 @@ import math
 class Solver:
 
 
-    def __init__(self):
+    def __init__(self, matricizer):
 
         # Initialize a materializer and matricizer
-        self.materializer = Materializer()
-        self.matricizer = Matricizer(self.materializer)
+        self.matricizer = matricizer
 
         # Initialize keff for each method
         self.cmfd_keff = 1.0
