@@ -57,9 +57,6 @@ class Solver:
         keff = 1.0
         phi = np.ones(4)
 
-        # Array for phi_res and keff_res
-        res = []
-
         for i in range(10):
 
             # Solve for the new flux using an Ax=b solve
@@ -92,41 +89,56 @@ class Solver:
 
         D_tilde = self.matricizer.getDiffusionTildes()
     
-        # Solve CMFD without diffusion correction terms
-        self.solveCMFD(tol=tol)
+        # Initial guess for keff
+        keff = 1E10
 
-        self.matricizer.initializeNEM4thOrderCoeffMatrix(keff=self.cmfd_keff)
-        nem4_coeff_matrix = self.matricizer.getNEM4thOrderCoeffMatrix()
+        for i in range(25):
 
-        self.nem4_phi_bar[14] = -self.cmfd_phi[0] + self.cmfd_phi[2]
-        self.nem4_phi_bar[15] = -self.cmfd_phi[1] + self.cmfd_phi[3] 
+            self.solveCMFD(tol=1E-5)
 
-        self.nem4_a = scipy.linalg.solve(nem4_coeff_matrix, self.nem4_phi_bar)
+            self.matricizer.initializeNEM4thOrderCoeffMatrix(keff=self.cmfd_keff)
+            nem4_coeff_matrix = self.matricizer.getNEM4thOrderCoeffMatrix()
 
-        # Compute current at interface in both groups
-        fuel_curr = [self.getNEM4Current(group=1, xi=1.,region=0), \
-                     self.getNEM4Current(group=2, xi=1.,region=0)]
-        mod_curr = [self.getNEM4Current(group=1, xi=0.,region=1), \
-                     self.getNEM4Current(group=2, xi=0.,region=1)]
+            self.nem4_phi_bar[14] = -self.cmfd_phi[0] + self.cmfd_phi[2]
+            self.nem4_phi_bar[15] = -self.cmfd_phi[1] + self.cmfd_phi[3] 
+            
+            self.nem4_a = scipy.linalg.solve(nem4_coeff_matrix,self.nem4_phi_bar)
 
-        print 'fuel current = ' + str(fuel_curr)
-        print 'moderator current = ' + str(mod_curr)
+            # Compute current at interface in both groups
+            fuel_curr = [self.getNEM4Current(group=1, xi=1.,region=0), \
+                             self.getNEM4Current(group=2, xi=1.,region=0)]
+            mod_curr = [self.getNEM4Current(group=1, xi=0.,region=1), \
+                            self.getNEM4Current(group=2, xi=0.,region=1)]
 
-        # Back out D_hat from interface currents
-        self.D_hat[0][0] = (D_tilde[0] * (self.cmfd_phi[0] - self.cmfd_phi[2]) -\
-                          fuel_curr[0]) / (self.cmfd_phi[0] + self.cmfd_phi[2])
-        self.D_hat[0][1] = (D_tilde[1] * (self.cmfd_phi[1] - self.cmfd_phi[3]) -\
-                          fuel_curr[1]) / (self.cmfd_phi[1] + self.cmfd_phi[3])
-        self.D_hat[1][0] = (D_tilde[0] * (self.cmfd_phi[0] - self.cmfd_phi[2]) -\
-                          mod_curr[0]) / (self.cmfd_phi[0] + self.cmfd_phi[2])
-        self.D_hat[1][1] = (D_tilde[1] * (self.cmfd_phi[1] - self.cmfd_phi[3]) -\
-                          mod_curr[1]) / (self.cmfd_phi[1] + self.cmfd_phi[3])
+            print 'fuel current = ' + str(fuel_curr)
+            print 'moderator current = ' + str(mod_curr)
 
-        print 'D_hat = ' + str(self.D_hat)
+            # Back out D_hat from interface currents
+            self.D_hat[0][0] = (D_tilde[0] * (self.cmfd_phi[0] - \
+                                 self.cmfd_phi[2]) - fuel_curr[0]) / \
+                                 (self.cmfd_phi[0] + self.cmfd_phi[2])
+            self.D_hat[0][1] = (D_tilde[1] * (self.cmfd_phi[1] - \
+                                 self.cmfd_phi[3]) - fuel_curr[1]) / \
+                                 (self.cmfd_phi[1] + self.cmfd_phi[3])
+            self.D_hat[1][0] = (D_tilde[0] * (self.cmfd_phi[0] - \
+                                 self.cmfd_phi[2]) - mod_curr[0]) / \
+                                 (self.cmfd_phi[0] + self.cmfd_phi[2])
+            self.D_hat[1][1] = (D_tilde[1] * (self.cmfd_phi[1] - \
+                                 self.cmfd_phi[3]) - mod_curr[1]) / \
+                                 (self.cmfd_phi[1] + self.cmfd_phi[3])
 
-        # Solve CMFD with new D_hat
-        
-        # Convergence criterion?
+            print 'D_hat = ' + str(self.D_hat)
+
+            # Compute the new residual
+            res = abs(self.cmfd_keff - keff)
+            keff = self.cmfd_keff
+
+            print ("NEM4: i=%d\tres=%1.5E\t\tkeff=%1.15f" % (i, res, keff))
+
+            if res < tol:
+                print ("NEM4 converged in %d iters with res=%1E"% (i, res))
+                self.nem4_keff = self.cmfd_keff
+                break
 
         
     def solveNEM2(self, tol=1E-10):
