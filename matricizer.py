@@ -83,8 +83,6 @@ class Matricizer:
         self.NEM4_coeffs[0,2] = (12. * self.D['fuel'][0] / self.delta_x**2) - \
                               (self.fission['fuel'][0] / (5. * float(keff))) + \
                               ((self.abs['fuel'][0] + self.scatter['fuel']) / 5.)
-        print 'keff = ' + str(keff)
-        print 'fission 1 = ' + str(-self.fission['fuel'][1] / 3.)
         self.NEM4_coeffs[0,4] = -self.fission['fuel'][1] / (3. * keff)
         self.NEM4_coeffs[0,6] = -self.fission['fuel'][1] / (5. * keff)
 
@@ -227,6 +225,11 @@ class Matricizer:
 
     def getMaterializer(self):
         return self.materializer
+
+
+    def getDeltaX(self):
+        return self.delta_x
+
 
     def getDiffusionTildes(self):
         return self.D_tilde
