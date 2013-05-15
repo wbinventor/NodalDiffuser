@@ -17,12 +17,15 @@ matricizer.initializeNEM2ndOrderCoeffMatrix()
 #matricizer.spyNEM2ndOrderCoeffMatrix()
 
 solver.solveCMFD()
+solver.generateCMFDFlux()
 solver.plotCMFDFlux()
 
 solver.solveNEM2()
+solver.generateNEM2Flux()
 solver.plotNEM2Flux()
 
 solver.solveNEM4()
+solver.generateNEM4Flux()
 solver.plotNEM4Flux()
 
 solver.plotAllFluxes(1)

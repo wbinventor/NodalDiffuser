@@ -30,8 +30,11 @@ class Solver:
 
         # Initialize arrays for fluxes (both energy groups) for each method
         self.cmfd_phi = np.ones(4)
+        self.cmfd_phi_final = np.ones((2,4))
         self.nem4_phi = np.ones((2, self.num_pts))
+        self.nem4_phi_final = np.ones((2, self.num_pts))
         self.nem2_phi = np.ones((2, self.num_pts))
+        self.nem2_phi_final = np.ones((2, self.num_pts))
 
         # Initialize arrays for NEM 
         self.nem4_a = np.zeros(16)
@@ -61,13 +64,13 @@ class Solver:
 
             # Solve for the new flux using an Ax=b solve
             phi_new = scipy.linalg.solve(M, (1./keff)*np.dot(F,phi))
-	
+
             # Update keff
             source_new = sum(np.dot(F,phi_new))
             source_old = sum(np.dot(F,phi))
-    
+
             keff_new = source_new / source_old * keff
-            
+
             # Normalize new flux and set it to be the old flux
             phi = phi_new / scipy.linalg.norm(phi_new) 
             keff = keff_new
@@ -75,13 +78,13 @@ class Solver:
             # Compute residuals
             res = math.sqrt(scipy.linalg.norm(source_old - source_new) / M.size)
 
-            print ("CMFD: i=%d\tres=%1.5E\t\tkeff=%1.15f" % (i, res, keff))
+            print ("CMFD: i=%d\tres=%1.5E\t\tkeff=%1.15f" % (i+1, res, keff))
 
             # Check convergence
             if res < tol:
-                print ("CMFD converged in %d iters with res=%1E"% (i, res))
+                print ("CMFD converged in %d iters with res=%1E"% (i+1, res))
                 self.cmfd_keff = keff
-                self.cmfd_phi = phi
+                self.cmfd_phi = np.copy(phi)
                 break
 
 
@@ -256,11 +259,40 @@ class Solver:
 
         return curr / self.matricizer.getDeltaX()
 
+
+    def generateCMFDFlux(self, num_pts=1000):
+
+        self.cmfd_phi_final = np.zeros((2,4))
+        self.cmfd_phi_final[0, 0] = self.cmfd_phi[0]      # fuel group 1
+        self.cmfd_phi_final[0, 1] = self.cmfd_phi[0]      # fuel group 1
+        self.cmfd_phi_final[1, 0] = self.cmfd_phi[1]      # fuel group 2
+        self.cmfd_phi_final[1, 1] = self.cmfd_phi[1]      # fuel group 2
+        self.cmfd_phi_final[0, 2] = self.cmfd_phi[2]      # coolant group 1
+        self.cmfd_phi_final[0, 3] = self.cmfd_phi[2]      # coolant group 1
+        self.cmfd_phi_final[1, 2] = self.cmfd_phi[3]      # coolant group 2
+        self.cmfd_phi_final[1, 3] = self.cmfd_phi[3]      # coolant group 2
+
     
-    def generateNEM4Flux(self, num_pts=100):
+    def generateNEM4Flux(self, num_pts=1000):
+
+        xi = np.linspace(0,1,500)
+
+        for group in [1,2]:
+            for region in [0,1]:
+                for i in range(500):
+                    self.nem4_phi_final[group-1, i+region*500] = \
+                                          self.getNEM4Flux(group, xi[i], region)
 
 
-    def generateNEM2Flux(self, num_pts=1000
+    def generateNEM2Flux(self, num_pts=1000):
+
+        xi = np.linspace(0,1,500)
+
+        for group in [1,2]:
+            for region in [0,1]:
+                for i in range(500):
+                    self.nem2_phi_final[group-1, i+region*500] = \
+                                          self.getNEM2Flux(group, xi[i], region)
 
 
     ############################################################################
@@ -269,20 +301,11 @@ class Solver:
 
     def plotCMFDFlux(self):
 
-        phi = np.zeros((2,4))
-        phi[0, 0] = self.cmfd_phi[0]      # fuel group 1
-        phi[0, 1] = self.cmfd_phi[0]      # fuel group 1
-        phi[1, 0] = self.cmfd_phi[1]      # fuel group 2
-        phi[1, 1] = self.cmfd_phi[1]      # fuel group 2
-        phi[0, 2] = self.cmfd_phi[2]      # coolant group 1
-        phi[0, 3] = self.cmfd_phi[2]      # coolant group 1
-        phi[1, 2] = self.cmfd_phi[3]      # coolant group 2
-        phi[1, 3] = self.cmfd_phi[3]      # coolant group 2
-
         fig = plt.figure()
-        plt.plot(self.cmfd_x, phi[0, :], linewidth=2)
-        plt.plot(self.cmfd_x, phi[1, :], linewidth=2)
+        plt.plot(self.cmfd_x, self.cmfd_phi_final[0, :], linewidth=2)
+        plt.plot(self.cmfd_x, self.cmfd_phi_final[1, :], linewidth=2)
         plt.title('Normalized CMFD Flux')
+        plt.ylim([0.,1.])
         plt.xlabel('x [cm]')
         plt.ylabel('Flux')
         plt.legend(['Group 1', 'Group 2'])
@@ -292,14 +315,11 @@ class Solver:
     def plotNEM4Flux(self):
         
         fig = plt.figure()
-        for group in [1,2]:
-            phi = []
-            for region in [0,1]:
-                for xi in np.linspace(0,1,500):
-                    phi.append(self.getNEM4Flux(group, xi, region))
-                 
-            plt.plot(self.nem_x, phi, linewidth=2)
+
+        plt.plot(self.nem_x, self.nem4_phi_final[0,:], linewidth=2)
+        plt.plot(self.nem_x, self.nem4_phi_final[1,:], linewidth=2)
             
+        plt.ylim([0.,1.])
         plt.xlabel('x [cm]')
         plt.ylabel('Flux')
         plt.title('Normalized NEM 4th Order Flux')
@@ -312,14 +332,10 @@ class Solver:
 
         fig = plt.figure()
 
-        for group in [1,2]:
-            phi = []
-            for region in [0,1]:
-                for xi in np.linspace(0,1,500):
-                    phi.append(self.getNEM2Flux(group, xi, region))
+        plt.plot(self.nem_x, self.nem2_phi_final[0,:], linewidth=2)
+        plt.plot(self.nem_x, self.nem2_phi_final[1,:], linewidth=2)
 
-            plt.plot(self.nem_x, phi, linewidth=2)
-            
+        plt.ylim([0.,1.])
         plt.xlabel('x [cm]')
         plt.ylabel('Flux')
         plt.title('Normalized NEM 2nd Order Flux')
@@ -331,40 +347,17 @@ class Solver:
 
         fig = plt.figure()
 
-        # CMFD Flux
-        phi = np.zeros((4))
-        if group == 1:
-            phi[0] = self.cmfd_phi[0]     # fuel group 1
-            phi[1] = self.cmfd_phi[0]     # fuel group 1
-            phi[2] = self.cmfd_phi[2]     # coolant group 1
-            phi[3] = self.cmfd_phi[2]     # coolant group 1
-        else:
-            phi[0] = self.cmfd_phi[1]     # fuel group 2
-            phi[1] = self.cmfd_phi[1]     # fuel group 2
-            phi[2] = self.cmfd_phi[3]     # coolant group 2
-            phi[3] = self.cmfd_phi[3]     # coolant group 2
+        plt.plot(self.cmfd_x, self.cmfd_phi_final[group-1,:], linewidth=2)
+        plt.plot(self.nem_x, self.nem2_phi_final[group-1,:], linewidth=2)
+        plt.plot(self.nem_x, self.nem4_phi_final[group-1,:], linewidth=2)
 
-        plt.plot(self.cmfd_x, phi, linewidth=2)
-
-        # NEM 2nd order flux
-        phi = []
-        for region in [0,1]:
-            for xi in np.linspace(0,1,500):
-                phi.append(self.getNEM2Flux(group, xi, region))
-
-        plt.plot(self.nem_x, phi, linewidth=2)
-
-        # NEM 4th order flux
-        phi = []
-        for region in [0,1]:
-            for xi in np.linspace(0,1,500):
-                phi.append(self.getNEM4Flux(group, xi, region))
-
-        plt.plot(self.nem_x, phi, linewidth=2)
-            
+        plt.ylim([0.,1.])
         plt.xlabel('x [cm]')
         plt.ylabel('Flux')
         plt.title('Normalized Flux in Group ' + str(group))
-        plt.legend(['CMFD', 'NEM-2', 'NEM-4'])
+        if group == 1:
+            plt.legend(['CMFD', 'NEM-2', 'NEM-4'], loc=1)
+        else:
+            plt.legend(['CMFD', 'NEM-2', 'NEM-4'], loc=2)
         plt.grid()
         plt.savefig('group-' + str(group) + '-fluxes.png')
