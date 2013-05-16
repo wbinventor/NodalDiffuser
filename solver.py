@@ -294,6 +294,30 @@ class Solver:
                     self.nem2_phi_final[group-1, i+region*500] = \
                                           self.getNEM2Flux(group, xi[i], region)
 
+    def generateReferenceFlux(self):
+        
+        # Group 1
+        file = open('../flux1.dat', 'r')
+        group1_phi = []
+        for line in file:
+            group1_phi.append(float(line))
+
+        # Group 2
+        file = open('../flux2.dat', 'r')
+        group2_phi = []
+        for line in file:
+            group2_phi.append(float(line))
+
+
+        group1_phi = np.array(group1_phi)
+        group1_phi *= (self.nem4_phi_final[0,0] / group1_phi[0])
+
+        group2_phi = np.array(group2_phi)
+        group2_phi *= (self.nem4_phi_final[1,0] / group2_phi[0])
+
+        self.ref_phi = np.array((group1_phi, group2_phi))
+        self.ref_x = np.linspace(0.,20.,group1_phi.size)
+
 
     ############################################################################
     ##################################  PLOTTING  ##############################
@@ -343,10 +367,28 @@ class Solver:
         plt.grid()
         plt.savefig('nem-2-flux.png')
 
+
+    def plotReferenceFlux(self):
+
+        fig = plt.figure()
+
+        plt.plot(self.ref_x, self.ref_phi[0,:], linewidth=2)
+        plt.plot(self.ref_x, self.ref_phi[1,:], linewidth=2)
+
+        plt.ylim([0.,1.])
+        plt.xlabel('x [cm]')
+        plt.ylabel('Flux')
+        plt.title('Normalized Reference Flux')
+        plt.legend(['Group 1', 'Group 2'])
+        plt.grid()
+        plt.savefig('ref-flux.png')
+
+
     def plotAllFluxes(self, group=1):
 
         fig = plt.figure()
 
+        plt.plot(self.ref_x, self.ref_phi[group-1,:], linewidth=2)
         plt.plot(self.cmfd_x, self.cmfd_phi_final[group-1,:], linewidth=2)
         plt.plot(self.nem_x, self.nem2_phi_final[group-1,:], linewidth=2)
         plt.plot(self.nem_x, self.nem4_phi_final[group-1,:], linewidth=2)
@@ -356,8 +398,8 @@ class Solver:
         plt.ylabel('Flux')
         plt.title('Normalized Flux in Group ' + str(group))
         if group == 1:
-            plt.legend(['CMFD', 'NEM-2', 'NEM-4'], loc=1)
+            plt.legend(['Ref.', 'CMFD', 'NEM-2', 'NEM-4'], loc=1)
         else:
-            plt.legend(['CMFD', 'NEM-2', 'NEM-4'], loc=2)
+            plt.legend(['Ref.', 'CMFD', 'NEM-2', 'NEM-4'], loc=2)
         plt.grid()
         plt.savefig('group-' + str(group) + '-fluxes.png')

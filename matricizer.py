@@ -257,27 +257,27 @@ class Matricizer:
 
     def spyCMFDProductionMatrix(self):
         fig = plt.figure()
-        plt.spy(self.F)
+        plt.spy(self.F, markersize=30)
         plt.title('CMFD Production Matrix')
         plt.show()
 
     
     def spyCMFDDestructionMatrix(self):
         fig = plt.figure()
-        plt.spy(self.M)
+        plt.spy(self.M, markersize=30)
         plt.title('CMFD Destruction Matrix')
         plt.show()
 
 
     def spyNEM4thOrderCoeffMatrix(self):
         fig = plt.figure()
-        plt.spy(self.NEM4_coeffs) 
-        plt.title('NEM-4 Coeffs')
+        plt.spy(self.NEM4_coeffs, markersize=20) 
+        plt.title('NEM-4 Coefficient Matrix')
         plt.show()
 
 
     def spyNEM2ndOrderCoeffMatrix(self):
         fig = plt.figure()
-        plt.spy(self.NEM2_coeffs) 
-        plt.title('NEM-2 Coeffs')
+        plt.spy(self.NEM2_coeffs, markersize=30) 
+        plt.title('NEM-2 Coefficient Matrix')
         plt.show()

@@ -10,14 +10,21 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       157,          7]
-NotebookDataLength[     23257,        707]
-NotebookOptionsPosition[     21808,        652]
-NotebookOutlinePosition[     22144,        667]
-CellTagsIndexPosition[     22101,        664]
+NotebookDataLength[     20594,        624]
+NotebookOptionsPosition[     19150,        569]
+NotebookOutlinePosition[     19486,        584]
+CellTagsIndexPosition[     19443,        581]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
 Notebook[{
+
+Cell[CellGroupData[{
+Cell["\<\
+NEM 2nd Order Constraint Matrix Calculation\
+\>", "Title",
+ CellChangeTimes->{{3.577618154860847*^9, 3.577618167259121*^9}}],
+
 Cell[BoxData[
  RowBox[{
   RowBox[{"Clear", "[", "\"\<Global`*\>\"", "]"}], 
@@ -536,8 +543,6 @@ Cell[CellGroupData[{
 Cell["Generate Coefficient Matrix", "Subtitle",
  CellChangeTimes->{{3.5774951808745193`*^9, 3.5774951878694553`*^9}}],
 
-Cell[CellGroupData[{
-
 Cell[BoxData[
  RowBox[{"MatrixForm", "[", 
   RowBox[{"(", 
@@ -558,95 +563,7 @@ Cell[BoxData[
     RowBox[{"[", "2", "]"}], "]"}], ")"}], "]"}]], "Input",
  CellChangeTimes->{{3.577490374671733*^9, 3.57749039592724*^9}, {
    3.577490435861989*^9, 3.577490440660171*^9}, 3.577490477341097*^9, {
-   3.577495060587504*^9, 3.577495067149201*^9}, 3.5774951730099993`*^9}],
-
-Cell[BoxData[
- TagBox[
-  RowBox[{"(", "\[NoBreak]", GridBox[{
-     {
-      RowBox[{"-", 
-       FractionBox[
-        RowBox[{"2", " ", 
-         SubscriptBox["D", "L1"]}], "h"]}], 
-      RowBox[{"-", 
-       FractionBox[
-        RowBox[{"6", " ", 
-         SubscriptBox["D", "L1"]}], "h"]}], "0", "0", "0", "0", "0", "0"},
-     {"0", "0", 
-      RowBox[{"-", 
-       FractionBox[
-        RowBox[{"2", " ", 
-         SubscriptBox["D", "L2"]}], "h"]}], 
-      RowBox[{"-", 
-       FractionBox[
-        RowBox[{"6", " ", 
-         SubscriptBox["D", "L2"]}], "h"]}], "0", "0", "0", "0"},
-     {"0", "0", "0", "0", 
-      RowBox[{"-", 
-       FractionBox[
-        RowBox[{"2", " ", 
-         SubscriptBox["D", "R1"]}], "h"]}], 
-      FractionBox[
-       RowBox[{"6", " ", 
-        SubscriptBox["D", "R1"]}], "h"], "0", "0"},
-     {"0", "0", "0", "0", "0", "0", 
-      RowBox[{"-", 
-       FractionBox[
-        RowBox[{"2", " ", 
-         SubscriptBox["D", "R2"]}], "h"]}], 
-      FractionBox[
-       RowBox[{"6", " ", 
-        SubscriptBox["D", "R2"]}], "h"]},
-     {
-      RowBox[{"-", 
-       FractionBox[
-        RowBox[{"2", " ", 
-         SubscriptBox["D", "L1"]}], "h"]}], 
-      FractionBox[
-       RowBox[{"6", " ", 
-        SubscriptBox["D", "L1"]}], "h"], "0", "0", 
-      FractionBox[
-       RowBox[{"2", " ", 
-        SubscriptBox["D", "R1"]}], "h"], 
-      FractionBox[
-       RowBox[{"6", " ", 
-        SubscriptBox["D", "R1"]}], "h"], "0", "0"},
-     {"0", "0", 
-      RowBox[{"-", 
-       FractionBox[
-        RowBox[{"2", " ", 
-         SubscriptBox["D", "L2"]}], "h"]}], 
-      FractionBox[
-       RowBox[{"6", " ", 
-        SubscriptBox["D", "L2"]}], "h"], "0", "0", 
-      FractionBox[
-       RowBox[{"2", " ", 
-        SubscriptBox["D", "R2"]}], "h"], 
-      FractionBox[
-       RowBox[{"6", " ", 
-        SubscriptBox["D", "R2"]}], "h"]},
-     {"1", 
-      RowBox[{"-", "1"}], "0", "0", "1", "1", "0", "0"},
-     {"0", "0", "1", 
-      RowBox[{"-", "1"}], "0", "0", "1", "1"}
-    },
-    GridBoxAlignment->{
-     "Columns" -> {{Center}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
-      "RowsIndexed" -> {}},
-    GridBoxSpacings->{"Columns" -> {
-        Offset[0.27999999999999997`], {
-         Offset[0.7]}, 
-        Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
-        Offset[0.2], {
-         Offset[0.4]}, 
-        Offset[0.2]}, "RowsIndexed" -> {}}], "\[NoBreak]", ")"}],
-  Function[BoxForm`e$, 
-   MatrixForm[BoxForm`e$]]]], "Output",
- CellChangeTimes->{{3.577490442633646*^9, 3.57749047826425*^9}, 
-   3.5774905721669703`*^9, 3.577490898927163*^9, 3.5774913392141533`*^9, 
-   3.577491992549498*^9, 3.577492139371688*^9, 3.577492235412931*^9, 
-   3.5774925768856087`*^9, 3.5774951195421886`*^9, 3.577495216911377*^9, 
-   3.577533988758925*^9}]
+   3.577495060587504*^9, 3.577495067149201*^9}, 3.5774951730099993`*^9}]
 }, Open  ]]
 }, Open  ]]
 },
@@ -666,47 +583,47 @@ CellTagsIndex->{}
 *)
 (*NotebookFileOutline
 Notebook[{
-Cell[557, 20, 204, 5, 55, "Input"],
 Cell[CellGroupData[{
-Cell[786, 29, 110, 1, 51, "Subtitle"],
-Cell[899, 32, 1103, 25, 77, "Input"],
-Cell[2005, 59, 89, 1, 32, "Input"]
+Cell[579, 22, 134, 3, 93, "Title"],
+Cell[716, 27, 204, 5, 55, "Input"],
+Cell[CellGroupData[{
+Cell[945, 36, 110, 1, 51, "Subtitle"],
+Cell[1058, 39, 1103, 25, 77, "Input"],
+Cell[2164, 66, 89, 1, 32, "Input"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[2131, 65, 99, 1, 51, "Subtitle"],
-Cell[2233, 68, 2680, 77, 108, "Input"],
-Cell[4916, 147, 89, 1, 55, "Input"]
+Cell[2290, 72, 99, 1, 51, "Subtitle"],
+Cell[2392, 75, 2680, 77, 108, "Input"],
+Cell[5075, 154, 89, 1, 55, "Input"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[5042, 153, 106, 1, 51, "Subtitle"],
-Cell[5151, 156, 2858, 81, 209, "Input"],
-Cell[8012, 239, 87, 1, 55, "Input"]
+Cell[5201, 160, 106, 1, 51, "Subtitle"],
+Cell[5310, 163, 2858, 81, 209, "Input"],
+Cell[8171, 246, 87, 1, 55, "Input"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[8136, 245, 126, 2, 51, "Subtitle"],
-Cell[8265, 249, 1523, 47, 121, "Input"]
+Cell[8295, 252, 126, 2, 51, "Subtitle"],
+Cell[8424, 256, 1523, 47, 121, "Input"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[9825, 301, 112, 1, 51, "Subtitle"],
-Cell[9940, 304, 3663, 105, 121, "Input"]
+Cell[9984, 308, 112, 1, 51, "Subtitle"],
+Cell[10099, 311, 3663, 105, 121, "Input"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[13640, 414, 194, 5, 81, "Subtitle"],
-Cell[13837, 421, 1757, 43, 143, "Input"]
+Cell[13799, 421, 194, 5, 81, "Subtitle"],
+Cell[13996, 428, 1757, 43, 143, "Input"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[15631, 469, 190, 2, 51, "Subtitle"],
-Cell[15824, 473, 1017, 25, 77, "Input"]
+Cell[15790, 476, 190, 2, 51, "Subtitle"],
+Cell[15983, 480, 1017, 25, 77, "Input"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[16878, 503, 134, 1, 51, "Subtitle"],
-Cell[17015, 506, 956, 24, 77, "Input"]
+Cell[17037, 510, 134, 1, 51, "Subtitle"],
+Cell[17174, 513, 956, 24, 77, "Input"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[18008, 535, 117, 1, 51, "Subtitle"],
-Cell[CellGroupData[{
-Cell[18150, 540, 835, 20, 32, "Input"],
-Cell[18988, 562, 2792, 86, 234, "Output"]
+Cell[18167, 542, 117, 1, 51, "Subtitle"],
+Cell[18287, 545, 835, 20, 32, "Input"]
 }, Open  ]]
 }, Open  ]]
 }
